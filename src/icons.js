@@ -1,0 +1,36 @@
+const paths = {
+  brand: '<path d="M3 5h18M3 12h18M3 19h18M6 3v6m7-6v6m5-6v6M4 10v5m5-5v5m7-5v5m-9 2v5m5-5v5m8-5v5"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="m3 17 5-4 4 3 4-6 5 6"/>',
+  upload: '<path d="M12 16V4m-4 4 4-4 4 4M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/>',
+  play: '<path d="m9 5 11 7-11 7z" fill="currentColor" stroke="none"/>',
+  pause: '<path d="M9 5v14m6-14v14" stroke-width="3"/>',
+  reset: '<path d="M5 10a7 7 0 1 1 1 7M5 4v6h6"/>',
+  wave: '<path d="M3 12h2m3-5v10m4-14v18m4-14v10m3-5h2"/>',
+  fullscreen: '<path d="M4 9V4h5m6 0h5v5m0 6v5h-5m-6 0H4v-5"/>',
+  record: '<circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" stroke="none"/>',
+  download: '<path d="M12 4v12m-4-4 4 4 4-4M4 17v3h16v-3"/>',
+  save: '<path d="M4 4h13l3 3v13H4zM8 4v5h8V4m-8 16v-6h8v6"/>',
+  folder: '<path d="M3 19V5h7l2 3h9v11z"/>',
+  square: '<rect x="5" y="5" width="14" height="14" fill="currentColor" stroke="none"/>',
+  rect: '<rect x="3" y="7" width="18" height="10" fill="currentColor" stroke="none"/>',
+  bar: '<path d="M3 12h18" stroke-width="2.1"/>',
+  cross: '<path d="M5 12h14M12 5v14" stroke-width="2"/>',
+  circle: '<circle cx="12" cy="12" r="7.1" fill="currentColor" stroke="none"/>',
+  ring: '<circle cx="12" cy="12" r="7.1"/>',
+  rings: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  squares: '<rect x="4" y="4" width="16" height="16"/><rect x="8" y="8" width="8" height="8"/>',
+  echo: '<path d="M10 4H4v6m0 4v6h6m4 0h6v-6m0-4V4h-6"/><rect x="8" y="8" width="8" height="8"/>',
+  breathe: '<path d="M2 16c5 0 4-9 10-9s5 9 10 9M6 17c3 0 3-4 6-4s3 4 6 4"/>',
+  stretch: '<path d="M4 20 20 4M4 13v7h7m2-16h7v7"/>',
+  spin: '<path d="M20 10a8 8 0 1 0-1 7m1-13v6h-6"/><path d="M12 9v6m-3-3h6"/>',
+  gather: '<path d="M4 9V4h5m6 0h5v5m0 6v5h-5m-6 0H4v-5m4-7 3 3m5-3-3 3m3 5-3-3m-5 3 3-3"/>',
+  bounce: '<path d="M2 18h20M3 15q5-16 10 0 3-9 8-1"/><circle cx="8" cy="5" r="1.2" fill="currentColor"/>',
+  flow: '<path d="M2 8c7-6 10 6 18 0m-4-3 4 3-3 3M2 15c7-6 10 6 18 0m-4-3 4 3-3 3"/>',
+  sway: '<path d="M12 19 5 6m7 13V4m0 15 7-13m-9 13h4"/>',
+  ripple: '<circle cx="9" cy="14" r="2"/><circle cx="9" cy="14" r="5"/><path d="M7 5a9 9 0 0 1 11 11"/>',
+  fold: '<path d="M3 6h18v12H3zM8 5l4-2 4 2v14l-4 2-4-2zM12 3v18"/>'
+}
+export const icon = (key, size = 16) => '<svg width="' + size + '" height="' + size +
+  '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths[key] + '</svg>'
+

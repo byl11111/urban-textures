@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="城市感官转译实验室。用图像和声音演奏抽象构成。">
+  <meta name="theme-color" content="#141416">
+  <title>Urban Textures · 城市感官转译实验室</title>
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <header class="mast">
+    <div class="identity">
+      <span class="brand-mark" data-icon="brand" aria-hidden="true"></span>
+      <div><h1>Urban Textures</h1><p>城市感官转译实验室</p></div>
+    </div>
+    <div class="exports" aria-label="作品操作">
+      <button id="fullscreen" class="square" type="button" title="全屏" aria-label="全屏" data-icon="fullscreen"></button>
+      <button id="png" type="button" data-icon="image" data-label="保存画面"></button>
+      <button id="record" class="record" type="button" data-icon="record" data-label="录制"></button>
+      <button id="video" class="record" hidden type="button" data-icon="download" data-label="下载视频"></button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <main class="stage" id="stage">
+      <div class="stage-top">
+        <div class="stage-title"><h2 id="work-title">粗粝墙面</h2><span id="work-subtitle">示例图像</span></div>
+        <span id="dimensions" class="canvas-size"></span>
+      </div>
+      <div class="presentation">
+        <div class="plate" id="plate">
+          <div class="frame"><canvas id="art" aria-label="根据图像和声音生成的实时作品"></canvas></div>
+        </div>
+      </div>
+      <div class="stage-bottom" aria-label="播放声音">
+        <button id="play" class="play" type="button" title="播放" aria-label="播放" data-icon="play"></button>
+        <button id="replay" class="square" type="button" title="从头播放" aria-label="从头播放" data-icon="reset"></button>
+        <label class="seek-label"><span class="sr-only">播放位置</span><input id="seek" type="range" min="0" max="1" step="0.01" value="0"></label>
+        <output id="time">00:00 / 00:00</output>
+        <div class="stage-audio" aria-label="声音活动"><span id="audio-state">静态预览</span><div id="meter" aria-hidden="true"></div></div>
+      </div>
+      <div id="feedback" role="status" aria-live="polite"></div>
+    </main>
+
+    <aside class="controls" aria-label="作品设置">
+      <div class="panel">
+        <section class="inputs" aria-label="上传素材">
+          <button id="image-drop" class="file-drop" type="button" title="选择或拖入图片">
+            <span class="file-glyph" data-icon="image" aria-hidden="true"></span>
+            <span class="file-copy"><strong>上传图像</strong><small id="image-name">粗粝墙面</small></span>
+            <span class="file-action" data-icon="upload" aria-hidden="true"></span>
+          </button>
+          <input type="file" hidden id="image-file" accept="image/*,.avif,.heic,.heif">
+          <button id="audio-drop" class="file-drop" type="button" title="选择或拖入声音">
+            <span class="file-glyph" data-icon="wave" aria-hidden="true"></span>
+            <span class="file-copy"><strong>上传音频</strong><small id="audio-name">缓慢起伏</small></span>
+            <span class="file-action" data-icon="upload" aria-hidden="true"></span>
+          </button>
+          <input type="file" hidden id="audio-file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,.aac,.opus,.mp4,.webm">
+        </section>
+
+        <section class="pad-section">
+          <div class="section-title"><h2>图形</h2><span id="form-count"></span></div>
+          <div id="form-options" class="pad-grid form-pads" aria-label="构图图形，可多选" role="group"></div>
+          <button id="reseed" class="reseed" type="button" data-label="随机分配" data-icon="reset"></button>
+          <div id="voxel-sliders" class="voxel-sliders"></div>
+        </section>
+
+        <section class="pad-section">
+          <div class="section-title"><h2>动态</h2><span id="active-count"></span></div>
+          <div id="motion-options" class="pad-grid motion-pads" aria-label="声音动态，可多选" role="group"></div>
+        </section>
+
+        <details class="more">
+          <summary>细调</summary>
+          <div id="sliders"></div>
+          <div id="advanced"></div>
+          <div class="advanced-row"><label for="background">画布底色</label><input type="color" id="background" value="#131315"></div>
+          <div class="advanced-row"><label for="palette">色彩</label><select id="palette"><option value="original">原图取色</option><option value="warm">温暖矿物</option><option value="mono">灰阶</option></select></div>
+          <div class="advanced-row"><label for="seed">生成种子</label><input type="number" id="seed" min="0" max="4294967295" step="1"></div>
+          <details class="more motion-bank">
+            <summary>动力与空间</summary>
+            <div id="motion-sliders"></div>
+            <div class="advanced-row"><label for="pad-mode">单键力度</label><select id="pad-mode"></select></div>
+            <label class="slider"><span class="slider-head">力度 <output id="pad-gain-value"></output></span><input id="pad-gain" type="range" min="0" max="1.25" step="0.01"></label>
+          </details>
+          <details class="more" id="echo-details">
+            <summary>重影</summary>
+            <div class="advanced-row"><label for="echo">样式</label><select id="echo">
+              <option value="auto">自动</option><option value="fan">扇形展开</option>
+              <option value="linear">单向层叠</option><option value="bilateral">双向错位</option>
+              <option value="radial">径向扩散</option><option value="trace">跟随轨迹</option>
+            </select></div>
+            <div id="echo-sliders"></div>
+            <div class="advanced-row"><label for="echoAxis">方向</label><select id="echoAxis">
+              <option value="auto">随局部运动</option><option value="right">向右 / 顺时针</option>
+              <option value="left">向左 / 逆时针</option><option value="up">向上</option><option value="down">向下</option>
+            </select></div>
+          </details>
+          <div class="advanced-row"><label for="image-demo">图像样本</label><select id="image-demo"></select></div>
+          <div class="advanced-row"><label for="audio-demo">声音样本</label><select id="audio-demo"></select></div>
+          <div class="canvas-info"><span id="cell-count"></span><span id="runtime"></span></div>
+        </details>
+      </div>
+      <div class="project-controls">
+        <button id="save-project" type="button" class="text-button" data-label="保存配置" data-icon="save"></button>
+        <button id="open-project" type="button" class="text-button" data-label="打开" data-icon="folder"></button>
+        <button id="reset" class="text-button" type="button" title="恢复默认参数">复位</button>
+        <input type="file" hidden id="project-file" accept="application/json,.json">
+      </div>
+    </aside>
+  </div>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
+
