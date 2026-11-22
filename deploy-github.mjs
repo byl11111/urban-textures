@@ -22,7 +22,11 @@ async function api(path, method = 'GET', body, allowMissing = false) {
   })
   if (allowMissing && response.status === 404) return null
   const result = response.status === 204 ? {} : await response.json()
-  if (!response.ok) throw Error(`${method} ${path} failed (${response.status}): ${result.message}`)
+  if (!response.ok) {
+    const error = Error(`${method} ${path} failed (${response.status}): ${result.message}`)
+    error.status = response.status
+    throw error
+  }
   return result
 }
 
@@ -42,6 +46,8 @@ if (!repo) {
   if (repo.private) throw Error('Existing repository is private. Visibility was preserved.')
 }
 
+let pagesCommit
+if (!process.argv.includes('--status')) {
 const root = new URL('.', import.meta.url)
 const file = path => new URL(path, root)
 const paths = ['index.html', 'package.json', 'build.mjs', 'README.md', '启动城市感官转译实验室.cmd', 'deploy-github.mjs']
@@ -73,15 +79,30 @@ const pagesTree = await api(base + '/git/trees', 'POST', { tree: [
   { ...website, path: 'index.html' },
   { path: '.nojekyll', mode: '100644', type: 'blob', sha: nojekyll.sha }
 ] })
-const pagesCommit = await api(base + '/git/commits', 'POST', {
+pagesCommit = await api(base + '/git/commits', 'POST', {
   message: 'Deploy static classroom site', tree: pagesTree.sha,
   parents: [pagesHead?.object.sha ?? commit.sha]
 })
 if (pagesHead) await api(base + '/git/refs/heads/gh-pages', 'PATCH', { sha: pagesCommit.sha, force: false })
 else await api(base + '/git/refs', 'POST', { ref: 'refs/heads/gh-pages', sha: pagesCommit.sha })
+} else {
+  const head = await api(base + '/git/ref/heads/gh-pages')
+  pagesCommit = { sha: head.object.sha }
+}
 
 let pages = await api(base + '/pages', 'GET', undefined, true)
-if (!pages) pages = await api(base + '/pages', 'POST', { source: { branch: 'gh-pages', path: '/' }, build_type: 'legacy' })
+if (!pages) {
+  try {
+    pages = await api(base + '/pages', 'POST', { source: { branch: 'gh-pages', path: '/' }, build_type: 'legacy' })
+  } catch (error) {
+    if (error.status !== 409) throw error
+    for (let i = 0; i < 6 && !pages; i++) {
+      await new Promise(resolve => setTimeout(resolve, 5000))
+      pages = await api(base + '/pages', 'GET', undefined, true)
+    }
+    if (!pages) throw Error('Pages is enabled but its status is temporarily unavailable')
+  }
+}
 else if (pages.source?.branch !== 'gh-pages') throw Error('Existing Pages source differs from gh-pages')
 console.log(JSON.stringify({ repository: repo.html_url, url: pages.html_url, status: pages.status, deployCommit: pagesCommit.sha }))
 
@@ -99,3 +120,4 @@ for (let i = 0; i < 36; i++) {
   await new Promise(resolve => setTimeout(resolve, 10000))
 }
 throw Error('Pages publication did not finish within six minutes')
+
